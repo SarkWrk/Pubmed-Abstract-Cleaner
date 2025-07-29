@@ -6,7 +6,7 @@ To use the programme:
 > [!TIP]
 > \> Save
 >
-> \> (Optional) Selection: All results on this page
+> \> (Optional) Selection: All results
 >
 > \> Format: Abstract (text)
 4. Create a "in", "out", and "wanted" folder in the programme directory if not already created.
