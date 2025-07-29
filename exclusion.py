@@ -65,11 +65,11 @@ for filename in os.listdir(os.path.join(os.path.dirname(__file__), in_path)):
 
             line_index += 1
     
-    with open(os.path.join(os.path.join(os.path.dirname(__file__), out_path), str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day) + ".csv"), "w+", encoding="UTF-8") as output_file:
-        output_file.write("Link,PMID,Title,Abstract,Authors\n")
+with open(os.path.join(os.path.join(os.path.dirname(__file__), out_path), str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day) + ".csv"), "w+", encoding="UTF-8") as output_file:
+    output_file.write("Link,PMID,Title,Abstract,Authors\n")
 
-    with open(os.path.join(os.path.join(os.path.dirname(__file__), out_path), str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day) + ".csv"), "a", encoding="UTF-8") as output_file:
-        for line in accepted_articles:
-            output_file.write(line)
-    
-    print("estimated: {}min".format(round(total_characters/(words_per_min*characters_per_word))))
+with open(os.path.join(os.path.join(os.path.dirname(__file__), out_path), str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day) + ".csv"), "a", encoding="UTF-8") as output_file:
+    for line in accepted_articles:
+        output_file.write(line)
+
+print("estimated: {}min".format(round(total_characters/(words_per_min*characters_per_word))))
