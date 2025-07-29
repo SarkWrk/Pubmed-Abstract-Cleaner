@@ -5,7 +5,9 @@ To use the programme:
 3. Download your search with the format "Abstract (text)".
 > [!TIP]
 > \> Save
+>
 > \> (Optional) Selection: All results on this page
+>
 > \> Format: Abstract (text)
 4. Create a "in", "out", and "wanted" folder in the programme directory if not already created.
 5. Move the .txt file to ./in.
