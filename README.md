@@ -12,5 +12,8 @@ To use the programme:
 4. Create a "in", "out", and "wanted" folder in the programme directory if not already created.
 5. Move the .txt file to ./in.
 6. Run formatter.py.
-7. Change the regex strings in exclusion.py to the values you want and run it.
+7. Change the regex strings in exclusion.py to the values you want and run it. (Optionally, change the code for the article filtering in expclusion.py to fit your needs)
 8. Results are in ./wanted.
+
+> [!NOTE]
+> The programme is not able to handle entries that don't have a title.

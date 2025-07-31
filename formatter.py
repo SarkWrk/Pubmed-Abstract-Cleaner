@@ -18,6 +18,7 @@ for filename in os.listdir(os.path.join(os.path.dirname(__file__), in_path)):
         in_conf_of_int = False
         in_copyright = False
         in_comments = False
+        in_updates = False
 
         formatted_text = ""
 
@@ -25,35 +26,48 @@ for filename in os.listdir(os.path.join(os.path.dirname(__file__), in_path)):
         for line in input_file.readlines():
             cleaned_line = line #line.strip()
 
+            # Ignore specific keywords
             if any(ignored_line in cleaned_line for ignored_line in ignored_lines):
                 continue
 
+            # Ignore the article number
             if regex.search("^\d+\. ", cleaned_line) and regex.search(";\d", cleaned_line):
                 in_title = True
                 continue
 
+            # Ignore author information section
             if "Author information:" in cleaned_line:
                 in_auth_info = True
                 continue
 
+            # Ignore erratums
             if "Erratum in" in cleaned_line:
                 in_erratum = True
                 continue
 
+            # Ignore collaborator section
             if "Collaborators:" in cleaned_line:
                 in_collaborators = True
                 continue
 
+            # Ignore conflict of interest section
             if "Conflict of interest statement:" in cleaned_line:
                 in_conf_of_int = True
                 continue
 
+            # Ignore copyright secton
             if "©" in cleaned_line:
                 in_copyright = True
                 continue
 
+            # Ignore comment section
             if regex.search("^Comment .n", cleaned_line):
                 in_comments = True
+                continue
+
+            # Ignore update section
+            if regex.search("^Update of", cleaned_line) or regex.search("^Update in", cleaned_line):
+                in_updates = True
                 continue
 
             if cleaned_line == ("" or "\n"):
@@ -64,8 +78,9 @@ for filename in os.listdir(os.path.join(os.path.dirname(__file__), in_path)):
                 in_conf_of_int = False
                 in_copyright = False
                 in_comments = False
+                in_updates = False
 
-            if (in_auth_info or in_erratum or in_collaborators or in_conf_of_int or in_title or in_copyright or in_comments) == True:
+            if (in_auth_info or in_erratum or in_collaborators or in_conf_of_int or in_title or in_copyright or in_comments or in_updates) == True:
                 continue
 
             formatted_text += cleaned_line

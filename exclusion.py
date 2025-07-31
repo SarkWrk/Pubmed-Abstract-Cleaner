@@ -5,8 +5,8 @@ import re as regex
 in_path = "out"
 out_path = "wanted"
 
-long_covid_names = ["long covid", "post.acute covid", "post.acute sars.cov", "post.acute.sequelae covid", "post.acute.sequelae sars.cov", "long.haul covid", "pcas", "pcs", "post.covid"] # This is regex
-accepted_disease_terms = ["aids", "hiv", "diabetes", "immunocomprom.* ", "immunodef.* "] # This is regex
+long_covid_names = ["long covid", "post.acute covid", "post.acute sars.cov", "post.acute.sequelae covid", "post.acute.sequelae sars.cov", "long.haul covid", "pacs", "pcs"] # This is regex
+accepted_disease_terms = ["aids", "hiv", "immunocomprom.*", "immunodef.*"] # This is regex
 dt = datetime.datetime.now()
 words_per_min = 120
 characters_per_word = 5
@@ -39,18 +39,26 @@ for filename in os.listdir(os.path.join(os.path.dirname(__file__), in_path)):
             except:
                 pass
 
+            # Article filtering starts here
+
             passed_long_covid_check = False
             passed_accepted_disease_terms_check = False
 
             for re in long_covid_names:
-                if regex.findall(re, abstract.casefold()):
+                found_in = regex.findall(" " + re + " ", abstract.casefold())
+                if found_in:
+                    # PCS can also mean physical component score
+                    if re == "pcs":
+                        if not regex.findall(" covid.\d+ ", abstract.casefold()):
+                            continue
                     passed_long_covid_check = True
 
             if passed_long_covid_check == False:
                 continue
 
             for re in accepted_disease_terms:
-                if regex.findall(re, abstract.casefold()):
+                found_in = regex.findall(" " + re + " ", abstract.casefold())
+                if found_in:
                     passed_accepted_disease_terms_check = True
 
             if passed_accepted_disease_terms_check == False:
@@ -58,6 +66,8 @@ for filename in os.listdir(os.path.join(os.path.dirname(__file__), in_path)):
 
             if pmid in accepted_pmids:
                 continue
+
+            # Article filtering ends here
 
             accepted_articles.append(line)
             accepted_pmids.append(pmid)
