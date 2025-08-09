@@ -1,9 +1,11 @@
 import os
 import re as regex
 
+# Relative paths for file locations
 in_path = "in"
 out_path = "out"
 
+# Set of keywords to ignore
 ignored_lines = ["PMCID:", "DOI:"]
 
 for filename in os.listdir(os.path.join(os.path.dirname(__file__), in_path)):
@@ -70,6 +72,7 @@ for filename in os.listdir(os.path.join(os.path.dirname(__file__), in_path)):
                 in_updates = True
                 continue
 
+            # Newline means that it's a new section
             if cleaned_line == ("" or "\n"):
                 in_title = False
                 in_auth_info = False
@@ -80,6 +83,7 @@ for filename in os.listdir(os.path.join(os.path.dirname(__file__), in_path)):
                 in_comments = False
                 in_updates = False
 
+            # Skip the sections we don't care about
             if (in_auth_info or in_erratum or in_collaborators or in_conf_of_int or in_title or in_copyright or in_comments or in_updates) == True:
                 continue
 
@@ -93,6 +97,7 @@ for filename in os.listdir(os.path.join(os.path.dirname(__file__), in_path)):
 
         next_line = ""
 
+        # Rewrite 
         for line in split_lines:
             if inc == len(split_lines) - 1:
                 next_line == ""

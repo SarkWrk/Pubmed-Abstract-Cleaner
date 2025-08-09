@@ -2,17 +2,30 @@ import os
 import datetime
 import re as regex
 
+# Relative paths for file locations
 in_path = "out"
 out_path = "wanted"
 
-long_covid_names = ["long covid", "post.acute covid", "post.acute sars.cov", "post.acute.sequelae covid", "post.acute.sequelae sars.cov", "long.haul covid", "pacs", "pcs"] # This is regex
-accepted_disease_terms = ["aids", "hiv", "immunocomprom.*", "immunodef.*"] # This is regex
+# Filter terms
+long_covid_names = ["long covid.?\d*", "post.acute covid.?\d*|post.acute sars.cov.?\d*", "post.acute of covid.?\d*|post.acute of sars.cov.?\d*",
+                    "post.acute.sequelae covid.?\d*|post.acute.sequelae sars.cov.?\d*", "post.acute.sequelae of covid.?\d*|post.acute.sequelae of sars.cov.?\d*",
+                    "post.acute covid.?\d* sequelae|post.acute sars.cov.?\d* sequelae", "long.haul covid.?\d*", "pasc" "pacs", "pcs"] # This is regex
+accepted_disease_terms = ["aids", "hiv", "plwh", "pwh", "plwhiv", "immunocomprom.*", "immunodef.*"] # This is regex
+
+# This is used to title the output .csv file
 dt = datetime.datetime.now()
+
+# Estimated read time params
 words_per_min = 120
 characters_per_word = 5
 
+# List of articles to be put in the output .csv file
 accepted_articles = []
+
+# List that will prevent duplicate pmids
 accepted_pmids = []
+
+# Character count stuff for estimate
 total_characters = 0
 
 for filename in os.listdir(os.path.join(os.path.dirname(__file__), in_path)):
@@ -48,8 +61,8 @@ for filename in os.listdir(os.path.join(os.path.dirname(__file__), in_path)):
                 found_in = regex.findall(" " + re + " ", abstract.casefold())
                 if found_in:
                     # PCS can also mean physical component score
-                    if re == "pcs":
-                        if not regex.findall(" covid.\d+ ", abstract.casefold()):
+                    if re == ("pcs" or "pasc" or "pacs"):
+                        if not regex.findall(" covid.?\d* ", abstract.casefold()):
                             continue
                     passed_long_covid_check = True
 
@@ -69,12 +82,14 @@ for filename in os.listdir(os.path.join(os.path.dirname(__file__), in_path)):
 
             # Article filtering ends here
 
+            # Append to list, prevent repeat pmids, character count for estimate
             accepted_articles.append(line)
             accepted_pmids.append(pmid)
             total_characters += len(abstract)
 
             line_index += 1
     
+# Write to file
 with open(os.path.join(os.path.join(os.path.dirname(__file__), out_path), str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day) + ".csv"), "w+", encoding="UTF-8") as output_file:
     output_file.write("Link,PMID,Title,Abstract,Authors\n")
 
