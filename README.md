@@ -9,11 +9,10 @@ To use the programme:
 > \> (Optional) Selection: All results
 >
 > \> Format: Abstract (text)
-4. Create a "in", "out", and "wanted" folder in the programme directory if not already created.
-5. Move the .txt file to ./in.
-6. Run formatter.py.
-7. Change the regex strings in exclusion.py to the values you want and run it. (Optionally, change the code for the article filtering in expclusion.py to fit your needs)
-8. Results are in ./wanted.
+5. Move the .txt file to ./in. (Create it if it doesn't exist.)
+6. Change the regex strings in 'exclusion_criteria' in ./settings/setings.json to the values you want. (Optionally, change the code for the article filtering in exclusion.py to fit your needs)
+7. Run main.py.
+8. Results are in ./wanted/{YYYY-MM-DD}.
 
 > [!NOTE]
 > The programme is not able to handle entries that don't have a title.

@@ -2,3 +2,4 @@ in/
 out/
 wanted/
 export.py
+__pycache__/

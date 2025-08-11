@@ -1,18 +1,33 @@
 import os
+import json
 import re as regex
 
 # Relative paths for file locations
-in_path = "in"
-out_path = "out"
+input_path = ""
+output_path = ""
 
 # Set of keywords to ignore
 ignored_lines = ["PMCID:", "DOI:"]
 
-for filename in os.listdir(os.path.join(os.path.dirname(__file__), in_path)):
-    if ".csv" in filename:
-        continue
+# Dirname
+correct_dir = os.path.dirname(os.path.dirname(__file__))
 
-    with open(os.path.join(os.path.join(os.path.dirname(__file__), in_path), filename), 'r', encoding="UTF-8") as input_file:
+# Log level
+log_level = ""
+
+with open(os.path.join(os.path.join(correct_dir, "settings"), "settings.json"), "r") as settings_file:
+    settings_string = settings_file.read()
+    settings = json.loads(settings_string)
+
+    log_level = settings["log_level"]
+    
+    input_path = settings["paths"]["input"]
+    output_path = settings["paths"]["output"]
+
+for filename in os.listdir(os.path.join(correct_dir, input_path)):
+    with open(os.path.join(os.path.join(correct_dir, input_path), filename), 'r', encoding="UTF-8") as input_file:
+        print("Parsing {}".format(filename))
+
         in_title = False
         in_auth_info = False
         in_erratum = False
@@ -113,9 +128,8 @@ for filename in os.listdir(os.path.join(os.path.dirname(__file__), in_path)):
             else:
                 new_text += line
 
-        # Write results to disk
-        with open(os.path.join(os.path.join(os.path.dirname(__file__), out_path), filename), 'w+', encoding="UTF-8") as output_txt:
-            output_txt.write(new_text)
+        if log_level == "Debug":
+            print("Prepared text file for csv formatting")
 
         # Write in csv format
         headers = ["Title", "Authors", "Abstract", "PMID", "Link"]
@@ -200,13 +214,16 @@ for filename in os.listdir(os.path.join(os.path.dirname(__file__), in_path)):
         new_file_name = filename.replace(".txt", ".csv")
 
         # Write results to disk
-        with open(os.path.join(os.path.join(os.path.dirname(__file__), out_path), new_file_name), 'w+', encoding="UTF-8") as output_csv:
+        with open(os.path.join(os.path.join(correct_dir, output_path), new_file_name), 'w+', encoding="UTF-8") as output_csv:
+            if log_level == "Debug":
+                print("Writing {} to disk".format(new_file_name))
+
             output_csv.write(header + "\n")
 
-        with open(os.path.join(os.path.join(os.path.dirname(__file__), out_path), new_file_name), 'a', encoding="UTF-8") as output_csv:
             for subdicts in articles:
                 dict = articles[subdicts]
                 try:
                     output_csv.write('"' + dict["Link"] + '"' + "," + '"' + dict["PMID"] + '"' + "," + '"' + dict["Title"] + '"' + "," + '"' + dict["Abstract"] + '"' + "," + '"' + dict["Authors"] + '"' + "\n")
                 except:
-                    print(dict)
+                    if log_level == ("Errors" or "Debug"):
+                        print("Errored trying to write an entry to {}!\nData: {}".format(new_file_name, dict))
