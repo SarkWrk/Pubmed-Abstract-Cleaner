@@ -2,6 +2,9 @@ import os
 import json
 import re as regex
 
+# Get query results from ./settings/queries.json
+import modules.server_query
+
 # Relative paths for file locations
 input_path = ""
 output_path = ""
@@ -48,7 +51,7 @@ for filename in os.listdir(os.path.join(correct_dir, input_path)):
                 continue
 
             # Ignore the article number
-            if regex.search("^\d+\. ", cleaned_line) and regex.search(";\d", cleaned_line):
+            if regex.search(r"^\d+\. ", cleaned_line) and regex.search(r";\d", cleaned_line):
                 in_title = True
                 continue
 
@@ -115,7 +118,7 @@ for filename in os.listdir(os.path.join(correct_dir, input_path)):
         # Rewrite 
         for line in split_lines:
             if inc == len(split_lines) - 1:
-                next_line == ""
+                pass
             else:
                 next_line = split_lines[inc + 1]
             inc += 1
@@ -151,7 +154,7 @@ for filename in os.listdir(os.path.join(correct_dir, input_path)):
             if "PMID:" in data:
                 create_new_subgroup = True
 
-                pmid = regex.findall("\d+", data)
+                pmid = regex.findall(r"\d+", data)
                 if not pmid:
                     articles[new_subdict]["PMID"] = ""
                 else:
