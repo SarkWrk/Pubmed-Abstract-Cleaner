@@ -5,7 +5,7 @@ import json
 import modules.formatter
 
 # Unique articles
-unique_articles = []
+unique_articles = {}
 unique_pmids = set()
 
 # Total duplicate articles
@@ -29,40 +29,30 @@ with open(os.path.join(os.path.join(correct_dir, "settings"), "settings.json"), 
     output_path = settings["paths"]["output"]
 
 for file_name in os.listdir(os.path.join(correct_dir, output_path)):
-    if "export.csv" in file_name:
+    if "export.json" in file_name:
         if log_level == "Debug":
-            print("export.csv already exists in directory - skipping!")
+            print("export.json already exists in directory - skipping!")
         continue
 
     with open(os.path.join(os.path.join(correct_dir, output_path), file_name), "r", encoding="UTF-8") as data:
         if log_level == "Debug":
             print("Opening {}".format(file_name))
 
-        lines = data.readlines()
-        in_header = True
-
-        pmid_section = 2
+        lines = json.loads(data.read())
 
         for line in lines:
-            if in_header == True:
-                in_header = False
-                continue
-        
-            split_line = line.split('","')
-
-            pmid = split_line[pmid_section]
+            data = lines[line]
+            pmid = data["PMID"]
 
             if pmid in unique_pmids:
                 total_duplicate_articles += 1
                 continue
             else:
                 unique_pmids.add(pmid)
-                unique_articles.append(line)
+                unique_articles[pmid] = data
 
-with open(os.path.join(os.path.join(correct_dir, output_path), "export.csv"), "w+", encoding="UTF-8") as export_file:
-    export_file.write("Link,PMID,Title,Abstract,Authors\n")
-
-    for article in unique_articles:
-        export_file.write(article)
+with open(os.path.join(os.path.join(correct_dir, output_path), "export.json"), "w+", encoding="UTF-8") as export_file:
+    output_string = json.dumps(unique_articles, indent=4, ensure_ascii=False, sort_keys=True)
+    export_file.write(output_string)
     
 print("Removed {} duplicate articles.".format(total_duplicate_articles))

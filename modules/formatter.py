@@ -129,15 +129,13 @@ for filename in os.listdir(os.path.join(correct_dir, input_path)):
                 new_text += line
 
         if log_level == "Debug":
-            print("Prepared text file for csv formatting")
+            print("Prepared text file for json formatting")
 
-        # Write in csv format
+        # Write in json format
         headers = ["Title", "Authors", "Abstract", "PMID", "Link"]
         link_starter = "https://pubmed.ncbi.nlm.nih.gov/"
 
-        header = "Link,PMID,Title,Abstract,Authors"
-
-        # Create new lines for csv format
+        # Create new lines for json format
         articles = {0: {}}
 
         split_output = new_text.splitlines()
@@ -206,24 +204,21 @@ for filename in os.listdir(os.path.join(correct_dir, input_path)):
                 dict["Abstract"] = ""
 
             try:
-                if dict["Author"]:
+                if dict["Authors"]:
                     pass
             except:
-                dict["Author"] = ""
+                dict["Authors"] = ""
 
-        new_file_name = filename.replace(".txt", ".csv")
+        new_file_name = filename.replace(".txt", ".json")
 
         # Write results to disk
-        with open(os.path.join(os.path.join(correct_dir, output_path), new_file_name), 'w+', encoding="UTF-8") as output_csv:
+        with open(os.path.join(os.path.join(correct_dir, output_path), new_file_name), 'w+', encoding="UTF-8") as output_json:
             if log_level == "Debug":
                 print("Writing {} to disk".format(new_file_name))
 
-            output_csv.write(header + "\n")
-
-            for subdicts in articles:
-                dict = articles[subdicts]
-                try:
-                    output_csv.write('"' + dict["Link"] + '"' + "," + '"' + dict["PMID"] + '"' + "," + '"' + dict["Title"] + '"' + "," + '"' + dict["Abstract"] + '"' + "," + '"' + dict["Authors"] + '"' + "\n")
-                except:
-                    if log_level == ("Errors" or "Debug"):
-                        print("Errored trying to write an entry to {}!\nData: {}".format(new_file_name, dict))
+            try:
+                output_string = json.dumps(articles, indent=4, ensure_ascii=False, sort_keys=True)
+                output_json.write(output_string)
+            except:
+                if log_level == "Errors" or log_level == "Debug":
+                    print("Errored trying to write an entry to {}!\nData: {}".format(new_file_name, articles))

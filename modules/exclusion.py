@@ -22,7 +22,7 @@ words_per_min = 120
 characters_per_word = 5
 
 # List of articles to be put in the output .csv file
-accepted_articles = []
+accepted_articles = {}
 
 # Character count stuff for estimate
 total_characters = 0
@@ -50,31 +50,15 @@ with open(os.path.join(os.path.join(correct_dir, "settings"), "settings.json"), 
     for criteria in exclusion_criteria["accepted_disease_terms"]:
         accepted_disease_terms.append(criteria.replace("\\\\", "\\"))
 
-with open(os.path.join(os.path.join(correct_dir, input_path), "export.csv"), 'r', encoding="UTF-8") as input_file:
-    lines = input_file.readlines()
+with open(os.path.join(os.path.join(correct_dir, input_path), "export.json"), 'r', encoding="UTF-8") as input_file:
+    lines = json.loads(input_file.read())
     abstract_index = 3
     
-    line_index = 0
     for line in lines:
-        if line_index == 0:
-            line_index += 1
-            continue
+        data = lines[line]
 
-        abstract = ""
-
-        data = line.split('","')
-        
-        try:
-            pmid = data[1]
-        except:
-            if log_level == ("Errors" or "Debug"):
-                print("Couldn't find the PMID in line {}. Data: {}".format(line_index, data))
-
-
-        try:
-            abstract = data[abstract_index]
-        except:
-            pass
+        abstract = data["Abstract"]
+        pmid = data["PMID"]
 
         # Article filtering starts here
 
@@ -103,17 +87,13 @@ with open(os.path.join(os.path.join(correct_dir, input_path), "export.csv"), 'r'
 
         # Article filtering ends here
 
-        # Append to list, prevent repeat pmids, character count for estimate
-        accepted_articles.append(line)
+        # Add to dictionary and character count for estimate
+        accepted_articles[pmid] = data
         total_characters += len(abstract)
-
-        line_index += 1
     
 # Write to file
-with open(os.path.join(os.path.join(correct_dir, output_path), str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day) + ".csv"), "w+", encoding="UTF-8") as output_file:
-    output_file.write("Link,PMID,Title,Abstract,Authors\n")
-
-    for line in accepted_articles:
-        output_file.write(line)
+with open(os.path.join(os.path.join(correct_dir, output_path), str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day) + ".json"), "w+", encoding="UTF-8") as output_file:
+    output_string = json.dumps(accepted_articles, indent=4, ensure_ascii=False, sort_keys=True)
+    output_file.write(output_string)
 
 print("Estimated: {}min".format(round(total_characters/(words_per_min*characters_per_word))))
